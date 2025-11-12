@@ -1,16 +1,15 @@
 # Lab 7 – CST8915 Full-stack Cloud-native Development  
+
 ## Sandra Rochelle Nyabeng Mineme - 041268641
 
----
 
-## 📺 Demo Video  
-👉 **YouTube Link:** *https://youtu.be/KbqXqCk7UVA*
 
----
+ **YouTube Link:** *https://youtu.be/KbqXqCk7UVA*
 
-# 📝 RabbitMQ Configuration Analysis
 
-## ✅ Is RabbitMQ Stateless or Stateful?
+# RabbitMQ Configuration Analysis
+
+## Is RabbitMQ Stateless or Stateful?
 
 RabbitMQ is a **stateful** application.
 
@@ -23,9 +22,6 @@ RabbitMQ is a **stateful** application.
 - All of this data must persist **beyond the lifecycle of the container**.
 
 A stateless application can be deleted and recreated without losing data.  
-
-
----
 
 
 ## **2. What Are the Implications of Running RabbitMQ Without Persistent Storage?**
@@ -52,7 +48,6 @@ This means:
  **Breaks the Algonquin Pet Store workflow**  
 Without persistent message storage, orders and product, operations can fail or disappear.
 
----
 
 ## **3. What Happens When the RabbitMQ Pod Is Deleted or Restarted?**
 
@@ -69,24 +64,23 @@ It means:
 The entire message state of the system is erased.  
 The application becomes unreliable and inconsistent.
 
----
 
 ## **4. Potential Solutions to Fix the RabbitMQ Configuration**
 
 Below are **research-based**, industry-standard solutions:
 
----
 
-### **Solution A: Use a StatefulSet Instead of a Deployment**
+### **Solution A: Use a StatefulSet**
 StatefulSet provides:
 - Stable pod names  
 - Stable network identity  
 - Correct ordering (for clustered RabbitMQ)  
 
----
+A StatefulSet ensures each pod has a persistent identity, unique network name, and stable storage, which is crucial for applications like databases that need to maintain state
 
 ### **Solution B: Add Persistent Storage**
 Use **PersistentVolume (PV)** + **PersistentVolumeClaim (PVC)**:
+A StatefulSet in Kubernetes does not automatically come with persistent storage by default. However, it can be configured to use persistent storage through PersistentVolumeClaims (PVCs).
 
 ```yaml
 volumeMounts:
@@ -98,7 +92,7 @@ volumes:
     persistentVolumeClaim:
       claimName: rabbitmq-pvc 
 ```
-Benefits:
+**Benefits**:
 
 Messages survive pod restarts
 
@@ -106,21 +100,9 @@ Messages survive pod restarts
 - The broker becomes reliable and consistent
 - This prevents the complete data loss currently present in the lab.
 
-### 3. Use the Official or Bitnami Helm Chart
 
-RabbitMQ is complex to run manually.
-The Helm chart includes:
-
-- Automatic persistent storage
-- Health probes
-- Production-grade defaults
-- Optional clustering
-- Preconfigured user/password and security options
-
-This is the most realistic approach used by enterprises on Kubernetes.
-
-### 4. Use an Operator (RabbitMQ Cluster Operator)
-
+### Solution C: Use an Operator (RabbitMQ Cluster Operator)
+The RabbitMQ Cluster Operator is a Kubernetes Operator that automates the management and operation of RabbitMQ clusters in Kubernetes environments. It simplifies the deployment, scaling, and management of RabbitMQ clusters, making it easier to handle the lifecycle of RabbitMQ instances in a Kubernetes environment.
 The RabbitMQ operator (official) automates:
 
 - Cluster creation
@@ -131,7 +113,7 @@ The RabbitMQ operator (official) automates:
 
 It also ensures correct data persistence and networking.
 
-### 5. Use a Fully Managed Service Instead (Recommended in Cloud Environments)
+### Other solutions: Use a Fully Managed Service Instead (Recommended in Cloud Environments)
 
 Instead of self-hosting RabbitMQ, most companies use a managed message broker such as:
 
@@ -141,7 +123,7 @@ Instead of self-hosting RabbitMQ, most companies use a managed message broker su
 
 Because they completely eliminate the operational challenges of running RabbitMQ.
 
-## Does Using Azure Service Bus Solve the Issues Identified With RabbitMQ Configuration in This Lab?
+##  **5. Does Using Azure Service Bus Solve the Issues Identified With RabbitMQ Configuration in This Lab?**
 
 Yes. Azure Service Bus solves all the issues.
 
